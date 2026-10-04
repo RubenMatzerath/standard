@@ -1,15 +1,17 @@
 # Atlas
 
-Jede Sitzung in diesem Repo ist mit Atlas verbunden: Der SessionStart-Hook
-`.claude/hooks/atlas-session-start.sh` lädt `GET /api/me/bootstrap` in den Kontext.
-Fehlt der Bootstrap im Kontext, ist Atlas nicht verbunden. Dann steht im Kontext der Grund.
+Atlas läuft ausschließlich über den SAC-Connector (MCP-Server `Connector`).
+Zu Beginn jeder Sitzung als Erstes den Bootstrap abrufen:
+`call` mit `integration: "atlas"`, `method: "GET"`, `path: "/api/me/bootstrap?source=startup"`.
+Der SessionStart-Hook `.claude/hooks/atlas-session-start.sh` erinnert daran, ruft Atlas aber selbst nicht auf.
 
 ## Zugang
 
-- Base URL: `$ATLAS_BASE_URL` (https://sharify-media-fzco-atlas.s2.sac.run/api)
-- Schlüssel: `$ATLAS_API_KEY`, hinterlegt in der Cloud-Umgebung
-- Aufruf: `curl -sS -H "Authorization: Bearer $ATLAS_API_KEY" "$ATLAS_BASE_URL/<pfad>"`
-- Den Schlüssel nie ausgeben, nie in Dateien schreiben, nie committen.
+- Kürzel der Integration: `atlas`. Pfade wie in der Atlas-Doku, mit `/api/...`.
+- Zugangsdaten setzt der Connector serverseitig ein. Nie eigene mitschicken, keinen `ATLAS_API_KEY` verwenden.
+- `list_integrations` und `my_access` zeigen leere Listen, obwohl `call` mit `atlas` funktioniert.
+  Das Kürzel liefert `find_endpoints`. Bei 403 zuerst `my_access` aufrufen.
+- Große Antworten und PDFs mit `binary: true` holen, PDFs mit `?format=base64`.
 
 ## Orientierung
 
